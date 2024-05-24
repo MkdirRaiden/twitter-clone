@@ -38,10 +38,12 @@ export const signup = async (req, res) => {
         userName: newUser.userName,
         fullName: newUser.fullName,
         email: newUser.email,
-        profileImg: newUser.profileImg,
-        coverImg: newUser.coverImg,
         following: newUser.following,
         followers: newUser.followers,
+        profileImg: newUser.profileImg,
+        coverImg: newUser.coverImg,
+        bio: newUser.bio,
+        link: newUser.link,
       });
     } else {
       res.status(400).json({ error: "Invalid user data!" });
@@ -58,22 +60,28 @@ export const login = async (req, res) => {
     const user = await User.findOne({ userName });
     const isPasswordCorrect = await bcrypt.compare(
       password,
-      user?.password || ""
+      user ? user.password : ""
     );
     if (!user || !isPasswordCorrect) {
       return res.json({ error: "Invalid credentials!" });
     }
-    generateTokenAndSetCookie(user._id, res);
-    res.status(201).json({
-      _id: user._id,
-      userName: user.userName,
-      fullName: user.fullName,
-      email: user.email,
-      profileImg: user.profileImg,
-      coverImg: user.coverImg,
-      following: user.following,
-      followers: user.followers,
-    });
+    if (user) {
+      generateTokenAndSetCookie(user._id, res);
+      res.status(201).json({
+        _id: user._id,
+        userName: user.userName,
+        fullName: user.fullName,
+        email: user.email,
+        following: user.following,
+        followers: user.followers,
+        profileImg: user.profileImg,
+        coverImg: user.coverImg,
+        bio: user.bio,
+        link: user.link,
+      });
+    } else {
+      res.status(400).json({ error: "Invalid user data!" });
+    }
   } catch (error) {
     console.log("Error in signup controller", error.message);
     res.status(500).json({ error: "Internal server error" });
