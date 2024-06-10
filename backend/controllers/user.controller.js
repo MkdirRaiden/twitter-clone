@@ -93,9 +93,8 @@ export const updateUser = async (req, res) => {
     confirmPassword,
     bio,
     link,
-    profileImg,
-    coverImg,
   } = req.body;
+  let { profileImg, coverImg } = req.body;
   const userId = req.user._id;
 
   try {

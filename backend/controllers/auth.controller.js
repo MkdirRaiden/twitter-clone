@@ -44,6 +44,7 @@ export const signup = async (req, res) => {
         coverImg: newUser.coverImg,
         bio: newUser.bio,
         link: newUser.link,
+        likedPosts: newUser.likedPosts,
       });
     } else {
       res.status(400).json({ error: "Invalid user data!" });
@@ -78,6 +79,7 @@ export const login = async (req, res) => {
         coverImg: user.coverImg,
         bio: user.bio,
         link: user.link,
+        likedPosts: user.likedPosts,
       });
     } else {
       res.status(400).json({ error: "Invalid user data!" });
@@ -98,7 +100,7 @@ export const logout = async (req, res) => {
   }
 };
 
-export const authCheck = async (req, res) => {
+export const authTest = async (req, res) => {
   try {
     const user = req.user;
     res.status(200).json(user);
