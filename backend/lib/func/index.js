@@ -1,7 +1,7 @@
 export const getUser = (user) => {
   return {
     _id: user._id,
-    userName: user.userName,
+    username: user.username,
     fullName: user.fullName,
     email: user.email,
     profileImg: user.profileImg,

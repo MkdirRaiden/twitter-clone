@@ -6,8 +6,8 @@ import Notification from "../models/notification.model.js";
 
 export const getUserProfile = async (req, res) => {
   try {
-    const { userName } = req.params;
-    if (req.user.userName != userName) {
+    const { username } = req.params;
+    if (req.user.username != username) {
       return res.status(400).json({ message: "You are not authorized!" });
     }
     const user = req.user;
@@ -87,7 +87,7 @@ export const updateUser = async (req, res) => {
   const {
     fullName,
     email,
-    userName,
+    username,
     oldPassword,
     newPassword,
     confirmPassword,
@@ -145,7 +145,7 @@ export const updateUser = async (req, res) => {
 
     user.fullName = fullName || user.fullName;
     user.email = email || user.email;
-    user.userName = userName || user.userName;
+    user.username = username || user.username;
     user.bio = bio || user.bio;
     user.link = link || user.link;
     user.profileImg = profileImg || user.profileImg;
