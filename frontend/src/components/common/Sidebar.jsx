@@ -1,96 +1,96 @@
 import XSvg from "../svgs/X";
-
-import { MdHomeFilled } from "react-icons/md";
-import { IoNotifications } from "react-icons/io5";
-import { FaUser } from "react-icons/fa";
+import { AiOutlineLogout } from "react-icons/ai";
 import { Link } from "react-router-dom";
-import { BiLogOut } from "react-icons/bi";
-import axios from "axios";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import toast from "react-hot-toast";
+import { usePost, useGetData } from "../../hooks/customHooks";
+import { useLocation } from "react-router-dom";
+import SidebarLinkData from "../../utils/sidebar/LinksData";
+import Search from "./Search";
 
-const Sidebar = ({ data }) => {
-  const queryClient = useQueryClient();
-  const { mutate: logout } = useMutation({
-    mutationFn: async () => {
-      try {
-        const res = await axios.post("/api/auth/logout");
-        let err = res.data.error;
-        if (err) return toast.error(err);
-        queryClient.invalidateQueries({ queryKey: ["authUser"] });
-      } catch (error) {
-        toast.error(error.response.data.error || "Failed to logout!");
-      }
-    },
+const Sidebar = ({ user }) => {
+  const { pathname, search, hash } = useLocation();
+  const { data: newNotifications, isLoading } = useGetData({
+    qKey: ["newNotifications", user.username],
+    url: "/api/notifications/new",
   });
 
-  const { data: authUser } = useQuery({ queryKey: ["authUser"] });
+  const { mutate: logout } = usePost();
 
   return (
-    <div className="md:flex-[2_2_0] w-18 max-w-52">
-      <div className="sticky top-0 left-0 h-screen flex flex-col border-r border-gray-700 w-20 md:w-full">
-        <Link to="/" className="flex justify-center md:justify-start">
-          <XSvg className="px-2 w-12 h-12 rounded-full fill-white hover:bg-stone-900" />
+    <>
+      <div className="sticky top-0 left-0 h-screen flex flex-col border-r-2 border-gray-700 w-20 md:w-full">
+        <Link
+          to="/"
+          className="flex justify-center md:justify-start md:items-center w-fit px-4 pt-3"
+        >
+          <XSvg className="fill-white w-10" />
+          <span className="font-bold font-mono text-xl md:inline hidden">
+            TWITTER
+          </span>
         </Link>
-        <ul className="flex flex-col gap-3 mt-4">
+        <ul className="flex flex-col gap-1 mt-4">
           <li className="flex justify-center md:justify-start">
-            <Link
-              to="/"
-              className="flex gap-3 items-center hover:bg-stone-900 transition-all rounded-full duration-300 py-2 pl-2 pr-4 max-w-fit cursor-pointer"
-            >
-              <MdHomeFilled className="w-8 h-8" />
-              <span className="text-lg hidden md:block">Home</span>
-            </Link>
+            <Search modalId={"large-screen"} cls={"sidebar-link"} />
           </li>
+          {SidebarLinkData.map((link, index) => {
+            return (
+              <li key={index} className="flex justify-center md:justify-start ">
+                <Link
+                  to={link.path}
+                  className={`relative ${
+                    pathname == link.path
+                      ? "sidebar-active-link"
+                      : "sidebar-link"
+                  }`}
+                >
+                  {link.icon}
+                  {!isLoading &&
+                    link.name == "Notifications" &&
+                    newNotifications?.length != 0 && (
+                      <div className="badge bg-red-500 rounded-full badge-xs absolute top-[0.6rem] left-8"></div>
+                    )}
+                  <span className="text-lg hidden md:block">{link.name}</span>
+                </Link>
+              </li>
+            );
+          })}
           <li className="flex justify-center md:justify-start">
             <Link
-              to="/notifications"
-              className="flex gap-3 items-center hover:bg-stone-900 transition-all rounded-full duration-300 py-2 pl-2 pr-4 max-w-fit cursor-pointer"
+              to={`/profile/${user.username}`}
+              className={`relative ${
+                pathname == `/profile/${user.username}`
+                  ? "sidebar-active-link"
+                  : "sidebar-link"
+              }`}
             >
-              <IoNotifications className="w-6 h-6" />
-              <span className="text-lg hidden md:block">Notifications</span>
-            </Link>
-          </li>
-
-          <li className="flex justify-center md:justify-start">
-            <Link
-              to={`/profile/${authUser?.username}`}
-              className="flex gap-3 items-center hover:bg-stone-900 transition-all rounded-full duration-300 py-2 pl-2 pr-4 max-w-fit cursor-pointer"
-            >
-              <FaUser className="w-6 h-6" />
+              <img
+                className={`w-7 h-7 rounded-full ${
+                  pathname == `/profile/${user.username}` ? "border-2" : ""
+                }`}
+                src={user.profileImg || "/avatar-placeholder.png"}
+                alt={user.name + "image"}
+              />
               <span className="text-lg hidden md:block">Profile</span>
             </Link>
           </li>
         </ul>
-        {authUser && (
-          <Link
-            to={`/profile/${authUser.username}`}
-            className="mt-auto mb-10 flex gap-2 items-start transition-all duration-300 hover:bg-[#181818] py-2 px-4 rounded-full"
+        {user && (
+          <button
+            className="mt-auto mb-5 sidebar-link"
+            onClick={(e) => {
+              e.preventDefault();
+              logout({
+                method: "post",
+                url: "/api/auth/logout",
+                callbackFn: () => {},
+              });
+            }}
           >
-            <div className="avatar hidden md:inline-flex">
-              <div className="w-8 rounded-full">
-                <img src={authUser?.profileImg || "/avatar-placeholder.png"} />
-              </div>
-            </div>
-            <div className="flex justify-between flex-1">
-              <div className="hidden md:block">
-                <p className="text-white font-bold text-sm w-20 truncate">
-                  {authUser?.fullName}
-                </p>
-                <p className="text-slate-500 text-sm">@{authUser?.username}</p>
-              </div>
-              <BiLogOut
-                className="w-5 h-5 cursor-pointer"
-                onClick={(e) => {
-                  e.preventDefault();
-                  logout();
-                }}
-              />
-            </div>
-          </Link>
+            <AiOutlineLogout className="w-7 h-7 cursor-pointer" />
+            <div className="text-lg hidden md:block">Logout</div>
+          </button>
         )}
       </div>
-    </div>
+    </>
   );
 };
 export default Sidebar;

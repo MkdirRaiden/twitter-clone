@@ -1,44 +1,41 @@
 import { useState } from "react";
-
 import Posts from "../../components/common/Posts";
 import CreatePost from "./CreatePost";
+import { useQuery } from "@tanstack/react-query";
 
 const HomePage = () => {
   const [feedType, setFeedType] = useState("forYou");
+  const { data: authUser, isLoading } = useQuery({ queryKey: ["authUser"] });
 
   return (
     <>
-      <div className="flex-[4_4_0] mr-auto border-r border-gray-700 min-h-screen">
-        {/* Header */}
-        <div className="flex w-full border-b border-gray-700">
-          <div
-            className={
-              "flex justify-center flex-1 p-3 hover:bg-secondary transition duration-300 cursor-pointer relative"
-            }
-            onClick={() => setFeedType("forYou")}
-          >
-            For you
-            {feedType === "forYou" && (
-              <div className="absolute bottom-0 w-10  h-1 rounded-full bg-primary"></div>
-            )}
-          </div>
-          <div
-            className="flex justify-center flex-1 p-3 hover:bg-secondary transition duration-300 cursor-pointer relative"
-            onClick={() => setFeedType("following")}
-          >
-            Following
-            {feedType === "following" && (
-              <div className="absolute bottom-0 w-10  h-1 rounded-full bg-primary"></div>
-            )}
-          </div>
+      {/* Header */}
+      <div className="flex w-full border-b border-gray-700 md:justify-around px-4 justify-between">
+        <div
+          className={`cursor-pointer py-2 text-lg hover:border-b-2 hover:border-primary  translation-all duration-0-300 ${
+            feedType == "forYou" ? "border-b-2 border-primary" : ""
+          }`}
+          onClick={() => setFeedType("forYou")}
+        >
+          For you
         </div>
-
-        {/*  CREATE POST INPUT */}
-        <CreatePost />
-
-        {/* POSTS */}
-        <Posts />
+        <div
+          className={`cursor-pointer py-2 text-lg hover:border-b-2 hover:border-primary  translation-all duration-0-300 ${
+            feedType == "following" ? "border-b-2 border-primary" : ""
+          }`}
+          onClick={() => setFeedType("following")}
+        >
+          Following
+        </div>
       </div>
+
+      {/*  CREATE POST INPUT */}
+      <div className="mt-2">
+        <CreatePost />
+      </div>
+
+      {/* POSTS */}
+      {!isLoading && <Posts feedType={feedType} user={authUser} />}
     </>
   );
 };

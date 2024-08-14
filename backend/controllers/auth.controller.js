@@ -12,13 +12,13 @@ export const signup = async (req, res) => {
     if (!emailRegex.test(email)) {
       return res.status(400).json({ error: "Invalid email format!" });
     }
-    const existingUser = await User.findOne({ username });
-    if (existingUser) {
-      return res.status(400).json({ error: "User name already taken!" });
-    }
     const existingEmail = await User.findOne({ email });
     if (existingEmail) {
       return res.status(400).json({ error: "Email already taken!" });
+    }
+    const existingUser = await User.findOne({ username });
+    if (existingUser) {
+      return res.status(400).json({ error: "User name already taken!" });
     }
     if (password.length < 6) {
       return res.status(400).json({
@@ -37,17 +37,20 @@ export const signup = async (req, res) => {
       generateTokenAndSetCookie(newUser._id, res);
       await newUser.save();
       res.status(201).json({
-        _id: newUser._id,
-        username: newUser.username,
-        fullName: newUser.fullName,
-        email: newUser.email,
-        following: newUser.following,
-        followers: newUser.followers,
-        profileImg: newUser.profileImg,
-        coverImg: newUser.coverImg,
-        bio: newUser.bio,
-        link: newUser.link,
-        likedPosts: newUser.likedPosts,
+        user: {
+          _id: newUser._id,
+          username: newUser.username,
+          fullName: newUser.fullName,
+          email: newUser.email,
+          following: newUser.following,
+          followers: newUser.followers,
+          profileImg: newUser.profileImg,
+          coverImg: newUser.coverImg,
+          bio: newUser.bio,
+          link: newUser.link,
+          likedPosts: newUser.likedPosts,
+        },
+        message: "User created and Logged in successfully!",
       });
     } else {
       res.status(400).json({ error: "Invalid user data!" });
@@ -74,17 +77,20 @@ export const login = async (req, res) => {
     if (user) {
       generateTokenAndSetCookie(user._id, res);
       res.status(201).json({
-        _id: user._id,
-        username: user.username,
-        fullName: user.fullName,
-        email: user.email,
-        following: user.following,
-        followers: user.followers,
-        profileImg: user.profileImg,
-        coverImg: user.coverImg,
-        bio: user.bio,
-        link: user.link,
-        likedPosts: user.likedPosts,
+        user: {
+          _id: user._id,
+          username: user.username,
+          fullName: user.fullName,
+          email: user.email,
+          following: user.following,
+          followers: user.followers,
+          profileImg: user.profileImg,
+          coverImg: user.coverImg,
+          bio: user.bio,
+          link: user.link,
+          likedPosts: user.likedPosts,
+        },
+        message: "Logged in successfully!",
       });
     } else {
       res.status(400).json({ error: "Invalid user data!" });

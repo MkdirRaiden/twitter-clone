@@ -1,14 +1,29 @@
 import { Link } from "react-router-dom";
 import RightPanelSkeleton from "../skeletons/RightPanelSkeleton";
-import { USERS_FOR_RIGHT_PANEL } from "../../utils/db/dummy";
+import { useFollow, useGetData } from "../../hooks/customHooks";
+import FollowButton from "./FollowButton";
+import { useQuery } from "@tanstack/react-query";
 
 const RightPanel = () => {
-  const isLoading = false;
+  const { data: authUser } = useQuery({ queryKey: ["authUser"] });
+  const [followUnfollow, isPending] = useFollow();
+  const { data: suggestedUsers, isLoading } = useGetData({
+    qKey: ["suggestedUsers"],
+    url: "/api/users/suggested",
+  });
 
   return (
-    <div className="hidden lg:block my-4 mx-2">
-      <div className="bg-[#16181C] p-4 rounded-md sticky top-2">
-        <p className="font-bold">Who to follow</p>
+    <>
+      <div className="bg-[#16181C] p-4 rounded-md my-4 sticky top-2">
+        <p className="font-bold mb-4 flex justify-between">
+          <span className="text-slate-500">Who to follow</span>
+          <Link
+            to={"/all-suggested-users"}
+            className="text-primary hover:underline"
+          >
+            See more
+          </Link>
+        </p>
         <div className="flex flex-col gap-4">
           {/* item */}
           {isLoading && (
@@ -19,8 +34,11 @@ const RightPanel = () => {
               <RightPanelSkeleton />
             </>
           )}
+          {!isLoading && suggestedUsers?.length == 0 && (
+            <p>No suggested users available.</p>
+          )}
           {!isLoading &&
-            USERS_FOR_RIGHT_PANEL?.map((user) => (
+            suggestedUsers?.map((user) => (
               <Link
                 to={`/profile/${user.username}`}
                 className="flex items-center justify-between gap-4"
@@ -42,18 +60,19 @@ const RightPanel = () => {
                   </div>
                 </div>
                 <div>
-                  <button
-                    className="btn bg-white text-black hover:bg-white hover:opacity-90 rounded-full btn-sm"
-                    onClick={(e) => e.preventDefault()}
-                  >
-                    Follow
-                  </button>
+                  <FollowButton
+                    cls="btn bg-white text-black hover:bg-white hover:opacity-90 rounded-full btn-sm"
+                    authUser={authUser}
+                    userId={user._id}
+                    isPending={isPending}
+                    followUnfollow={followUnfollow}
+                  />
                 </div>
               </Link>
             ))}
         </div>
       </div>
-    </div>
+    </>
   );
 };
 export default RightPanel;

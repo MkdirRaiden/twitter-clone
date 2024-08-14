@@ -1,4 +1,4 @@
-import mongoose, { mongo } from "mongoose";
+import mongoose from "mongoose";
 
 const postSchema = new mongoose.Schema(
   {
@@ -32,6 +32,11 @@ const postSchema = new mongoose.Schema(
         },
       },
     ],
+
+    repost: {
+      type: Number,
+      default: 0,
+    },
   },
   { timestamps: true }
 );

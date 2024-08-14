@@ -1,97 +1,107 @@
-import { Link } from "react-router-dom";
+import { useFollow, useGetData, usePost } from "../../hooks/customHooks";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
+import Notification from "../../components/common/Notification";
 import LoadingSpinner from "../../components/common/LoadingSpinner";
 
-import { IoSettingsOutline } from "react-icons/io5";
-import { FaUser } from "react-icons/fa";
-import { FaHeart } from "react-icons/fa6";
-
 const NotificationPage = () => {
-  const isLoading = false;
-  const notifications = [
-    {
-      _id: "1",
-      from: {
-        _id: "1",
-        username: "johndoe",
-        profileImg: "/avatars/boy2.png",
-      },
-      type: "follow",
-    },
-    {
-      _id: "2",
-      from: {
-        _id: "2",
-        username: "janedoe",
-        profileImg: "/avatars/girl1.png",
-      },
-      type: "like",
-    },
-  ];
+  const queryClient = useQueryClient();
+  const { data: authUser } = useQuery({ queryKey: ["authUser"] });
+  const { mutate: deleteAll, isPending: isDeletingAll } = usePost();
+  const { mutate: deleteOne, isPending: isDeletingOne } = usePost();
+  const [followUnfollow, isPending] = useFollow();
 
-  const deleteNotifications = () => {
-    alert("All notifications deleted");
+  const { data: notifications, isLoading } = useGetData({
+    qKey: ["notifications", authUser.username],
+    url: "/api/notifications/",
+  });
+
+  const deleteNotifications = (e) => {
+    e.preventDefault();
+    deleteAll({
+      method: "delete",
+      url: "/api/notifications/",
+      qKey: ["notifications", authUser.username],
+      callbackFn: () => {},
+    });
   };
+
+  let oldNotifications, newNotifications;
+  if (!isLoading) {
+    oldNotifications = notifications.filter((n) => n.read == true);
+    newNotifications = notifications.filter((n) => n.read == false);
+  }
+
+  useEffect(() => {
+    queryClient.invalidateQueries({
+      queryKey: ["newNotifications", authUser.username],
+    });
+  }, [notifications]);
 
   return (
     <>
-      <div className="flex-[4_4_0] border-l border-r border-gray-700 min-h-screen">
-        <div className="flex justify-between items-center p-4 border-b border-gray-700">
-          <p className="font-bold">Notifications</p>
-          <div className="dropdown ">
-            <div tabIndex={0} role="button" className="m-1">
-              <IoSettingsOutline className="w-4" />
-            </div>
-            <ul
-              tabIndex={0}
-              className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
-            >
-              <li>
-                <a onClick={deleteNotifications}>Delete all notifications</a>
-              </li>
-            </ul>
-          </div>
-        </div>
-        {isLoading && (
-          <div className="flex justify-center h-full items-center">
-            <LoadingSpinner size="lg" />
-          </div>
+      <div className="flex justify-between items-center p-4 border-b border-gray-700">
+        <p className="font-bold">Notifications</p>
+        {isDeletingAll && (
+          <p>
+            Deleting all...
+            <LoadingSpinner size="xs" />
+          </p>
         )}
-        {notifications?.length === 0 && (
-          <div className="text-center p-4 font-bold">No notifications 🤔</div>
+        {!isDeletingAll && !notifications?.length == 0 && (
+          <a
+            className="text-primary hover:underline hover:cursor-pointer"
+            onClick={deleteNotifications}
+          >
+            Delete all notifications
+          </a>
         )}
-        {notifications?.map((notification) => (
-          <div className="border-b border-gray-700" key={notification._id}>
-            <div className="flex gap-2 p-4">
-              {notification.type === "follow" && (
-                <FaUser className="w-7 h-7 text-primary" />
-              )}
-              {notification.type === "like" && (
-                <FaHeart className="w-7 h-7 text-red-500" />
-              )}
-              <Link to={`/profile/${notification.from.username}`}>
-                <div className="avatar">
-                  <div className="w-8 rounded-full">
-                    <img
-                      src={
-                        notification.from.profileImg ||
-                        "/avatar-placeholder.png"
-                      }
-                    />
-                  </div>
-                </div>
-                <div className="flex gap-1">
-                  <span className="font-bold">
-                    @{notification.from.username}
-                  </span>{" "}
-                  {notification.type === "follow"
-                    ? "followed you"
-                    : "liked your post"}
-                </div>
-              </Link>
-            </div>
-          </div>
-        ))}
       </div>
+      {notifications?.length === 0 && (
+        <div className="text-center p-4 font-bold">No notifications 🤔</div>
+      )}{" "}
+      {!isLoading && notifications?.length !== 0 && (
+        <p className="px-4 py-2 font-bold">New Notifications</p>
+      )}
+      {!isLoading &&
+        newNotifications?.map((notification) => (
+          <Notification
+            key={notification._id}
+            notification={notification}
+            authUser={authUser}
+            isPending={isPending}
+            followUnfollow={followUnfollow}
+            isDeletingOne={isDeletingOne}
+            deleteOne={deleteOne}
+          />
+        ))}
+      {!isLoading &&
+        notifications?.length != 0 &&
+        newNotifications?.length == 0 && (
+          <p className="text-center border-b border-gray-700 pb-8">
+            No new notifications
+          </p>
+        )}
+      {!isLoading && !isLoading && notifications?.length !== 0 && (
+        <p className="px-4 py-2 font-bold">Earlier Notifications</p>
+      )}
+      {!isLoading &&
+        oldNotifications?.map((notification) => (
+          <Notification
+            key={notification._id}
+            notification={notification}
+            authUser={authUser}
+            isPending={isPending}
+            followUnfollow={followUnfollow}
+            isDeletingOne={isDeletingOne}
+            deleteOne={deleteOne}
+          />
+        ))}
+      {!isLoading &&
+        notifications?.length != 0 &&
+        oldNotifications?.length == 0 && (
+          <p className="text-center pb-8">No earlier notifications</p>
+        )}
     </>
   );
 };

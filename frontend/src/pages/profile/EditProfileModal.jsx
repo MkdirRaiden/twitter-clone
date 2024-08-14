@@ -1,7 +1,12 @@
 import { useState } from "react";
+import { usePost } from "../../hooks/customHooks";
+import LoadingSpinner from "../../components/common/LoadingSpinner";
+import { RxUpdate } from "react-icons/rx";
+import { useNavigate } from "react-router-dom";
 
-const EditProfileModal = () => {
-  const [formData, setFormData] = useState({
+const EditProfileModal = ({ username }) => {
+  const navigate = useNavigate();
+  const myObj = {
     fullName: "",
     username: "",
     email: "",
@@ -9,11 +14,14 @@ const EditProfileModal = () => {
     link: "",
     newPassword: "",
     currentPassword: "",
-  });
+  };
+  const [formData, setFormData] = useState(myObj);
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
+
+  const { mutate: update, isPending } = usePost();
 
   return (
     <>
@@ -32,7 +40,18 @@ const EditProfileModal = () => {
             className="flex flex-col gap-4"
             onSubmit={(e) => {
               e.preventDefault();
-              alert("Profile updated successfully");
+              update({
+                method: "put",
+                url: "/api/users/update",
+                data: formData,
+                qKey: ["userProfile", formData.username || username],
+                callbackFn: () => {
+                  setFormData(myObj);
+                  if (formData.username) {
+                    navigate(`/profile/${formData.username}`);
+                  }
+                },
+              });
             }}
           >
             <div className="flex flex-wrap gap-2">
@@ -96,13 +115,25 @@ const EditProfileModal = () => {
               name="link"
               onChange={handleInputChange}
             />
-            <button className="btn btn-primary rounded-full btn-sm text-white">
-              Update
+            <button
+              disabled={isPending}
+              className="btn btn-primary rounded-full btn-md text-white"
+            >
+              {isPending ? (
+                <>
+                  Updating
+                  <LoadingSpinner size="xs" />
+                </>
+              ) : (
+                <>
+                  Update <RxUpdate />
+                </>
+              )}
             </button>
           </form>
         </div>
         <form method="dialog" className="modal-backdrop">
-          <button className="outline-none">close</button>
+          <button className="outline-none cursor-default">close</button>
         </form>
       </dialog>
     </>

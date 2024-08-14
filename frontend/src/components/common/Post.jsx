@@ -1,37 +1,99 @@
-import { FaRegComment } from "react-icons/fa";
+import {
+  FaRegComment,
+  FaComment,
+  FaRegHeart,
+  FaTrash,
+  FaHeart,
+} from "react-icons/fa";
 import { BiRepost } from "react-icons/bi";
-import { FaRegHeart } from "react-icons/fa";
-import { FaRegBookmark } from "react-icons/fa6";
-import { FaTrash } from "react-icons/fa";
+import { FaRegBookmark, FaBookmark } from "react-icons/fa6";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { usePost } from "../../hooks/customHooks";
+import LoadingSpinner from "../../components/common/LoadingSpinner";
+import moment from "moment";
+import toast from "react-hot-toast";
 
-const Post = ({ post }) => {
+const Post = ({ post, username, savedPosts, setSavedPosts }) => {
+  // console.log(savedPosts);
+  const queryClient = useQueryClient();
+  const { data: authUser } = useQuery({ queryKey: ["authUser"] });
   const [comment, setComment] = useState("");
   const postOwner = post.user;
-  const isLiked = false;
+  const isLiked = post.likes.includes(authUser._id);
+  const isMyPost = postOwner._id == authUser._id;
 
-  const isMyPost = true;
+  const formattedDate = moment(post.createdAt).startOf("minute").fromNow();
 
-  const formattedDate = "1h";
+  const { mutate: deletePost, isPending: isDeleting } = usePost();
 
-  const isCommenting = false;
+  const { mutate: commentOnPost, isPending: isCommenting } = usePost();
 
-  const handleDeletePost = () => {};
+  const { mutate: likePost } = usePost();
+
+  const { mutate: repost } = usePost();
+
+  const handleDeletePost = () => {
+    deletePost({
+      method: "delete",
+      url: `/api/posts/${post._id}`,
+      qKey: ["posts", username],
+      callbackFn: () => {
+        return;
+      },
+    });
+  };
 
   const handlePostComment = (e) => {
     e.preventDefault();
+    commentOnPost({
+      method: "post",
+      url: `/api/posts/comment/${post._id}`,
+      qKey: ["posts", username],
+      data: { text: comment },
+      callbackFn: () => {
+        setComment("");
+      },
+    });
   };
 
-  const handleLikePost = () => {};
+  const handleLikePost = () => {
+    likePost({
+      method: "post",
+      url: `/api/posts/like/${post._id}`,
+      qKey: ["posts", username],
+      callbackFn: () => {},
+    });
+  };
+  const handleRepost = () => {
+    repost({
+      method: "put",
+      url: `/api/users/repost/${post._id}`,
+      qKey: ["posts", username],
+      callbackFn: () => {},
+    });
+  };
+  const handleSave = () => {
+    if (savedPosts.includes(post._id)) {
+      savedPosts.splice(savedPosts.indexOf(post._id));
+      toast.success("Post unsaved successfully!");
+    } else {
+      savedPosts.push(post._id);
+      toast.success("Post saved successfully!");
+    }
+    setSavedPosts(savedPosts);
+    localStorage.setItem("saved", JSON.stringify(savedPosts));
+    queryClient.invalidateQueries({ queryKey: ["posts", username] });
+  };
 
   return (
     <>
-      <div className="flex gap-2 items-start p-4 border-b border-gray-700">
+      <div className="flex gap-2 items-start p-4">
         <div className="avatar">
           <Link
             to={`/profile/${postOwner.username}`}
-            className="w-8 rounded-full overflow-hidden"
+            className="w-8 h-8 rounded-full overflow-hidden"
           >
             <img src={postOwner.profileImg || "/avatar-placeholder.png"} />
           </Link>
@@ -48,14 +110,15 @@ const Post = ({ post }) => {
               <span>·</span>
               <span>{formattedDate}</span>
             </span>
-            {isMyPost && (
-              <span className="flex justify-end flex-1">
+            <span className="flex justify-end flex-1">
+              {isMyPost && !isDeleting && (
                 <FaTrash
                   className="cursor-pointer hover:text-red-500"
                   onClick={handleDeletePost}
                 />
-              </span>
-            )}
+              )}
+              {isMyPost && isDeleting && <LoadingSpinner size="sm" />}
+            </span>
           </div>
           <div className="flex flex-col gap-3 overflow-hidden">
             <span>{post.text}</span>
@@ -77,8 +140,19 @@ const Post = ({ post }) => {
                     .showModal()
                 }
               >
-                <FaRegComment className="w-4 h-4  text-slate-500 group-hover:text-sky-400" />
-                <span className="text-sm text-slate-500 group-hover:text-sky-400">
+                {post.comments.length != 0 ? (
+                  <FaComment className="text-sky-400" />
+                ) : (
+                  <FaRegComment className="w-4 h-4  text-slate-500 group-hover:text-sky-400" />
+                )}
+
+                <span
+                  className={`text-sm ${
+                    post.comments.length != 0
+                      ? "text-sky-400"
+                      : "text-slate-500"
+                  } group-hover:text-sky-400`}
+                >
                   {post.comments.length}
                 </span>
               </div>
@@ -133,7 +207,11 @@ const Post = ({ post }) => {
                     />
                     <button className="btn btn-primary rounded-full btn-sm text-white px-4">
                       {isCommenting ? (
-                        <span className="loading loading-spinner loading-md"></span>
+                        <>
+                          {" "}
+                          Posting...
+                          <span className="loading loading-spinner loading-md"></span>
+                        </>
                       ) : (
                         "Post"
                       )}
@@ -144,10 +222,19 @@ const Post = ({ post }) => {
                   <button className="outline-none">close</button>
                 </form>
               </dialog>
-              <div className="flex gap-1 items-center group cursor-pointer">
-                <BiRepost className="w-6 h-6  text-slate-500 group-hover:text-green-500" />
+              <div
+                className="flex gap-1 items-center group cursor-pointer"
+                onClick={handleRepost}
+              >
+                <BiRepost
+                  className={`w-6 h-6 ${
+                    post.repost >= 1
+                      ? "text-green-500"
+                      : "text-slate-500 group-hover:text-green-500"
+                  }`}
+                />
                 <span className="text-sm text-slate-500 group-hover:text-green-500">
-                  0
+                  {post.repost}
                 </span>
               </div>
               <div
@@ -158,7 +245,7 @@ const Post = ({ post }) => {
                   <FaRegHeart className="w-4 h-4 cursor-pointer text-slate-500 group-hover:text-pink-500" />
                 )}
                 {isLiked && (
-                  <FaRegHeart className="w-4 h-4 cursor-pointer text-pink-500 " />
+                  <FaHeart className="w-4 h-4 cursor-pointer text-pink-500 " />
                 )}
 
                 <span
@@ -170,8 +257,15 @@ const Post = ({ post }) => {
                 </span>
               </div>
             </div>
-            <div className="flex w-1/3 justify-end gap-2 items-center">
-              <FaRegBookmark className="w-4 h-4 text-slate-500 cursor-pointer" />
+            <div
+              onClick={handleSave}
+              className="flex w-1/3 justify-end gap-2 items-center"
+            >
+              {savedPosts.includes(post._id) ? (
+                <FaBookmark className="w-4 h-4 text-slate-300 cursor-pointer" />
+              ) : (
+                <FaRegBookmark className="w-4 h-4 text-slate-500 cursor-pointer" />
+              )}
             </div>
           </div>
         </div>
