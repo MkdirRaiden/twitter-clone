@@ -19,6 +19,16 @@ function App() {
     url: "/api/auth/getAuthUser",
   });
 
+    if (isLoading) {
+    return (
+      <>
+        <div className="flex max-w-full-screen-2xl h-screen justify-center items-center">
+          <span className="loading loading-spinner loading-lg"></span>
+        </div>
+      </>
+    );
+  }
+
   return (
     <>
       <Routes>
