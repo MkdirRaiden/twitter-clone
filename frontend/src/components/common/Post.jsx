@@ -30,9 +30,9 @@ const Post = ({ post, username, savedPosts, setSavedPosts }) => {
 
   const { mutate: commentOnPost, isPending: isCommenting } = usePost();
 
-  const { mutate: likePost } = usePost();
+  const { mutate: likePost, isPending: isLiking } = usePost();
 
-  const { mutate: repost } = usePost();
+  const { mutate: repost, isPending: isReposting } = usePost();
 
   const handleDeletePost = () => {
     deletePost({
@@ -226,35 +226,39 @@ const Post = ({ post, username, savedPosts, setSavedPosts }) => {
                 className="flex gap-1 items-center group cursor-pointer"
                 onClick={handleRepost}
               >
-                <BiRepost
+                { !isReposting && <BiRepost
                   className={`w-6 h-6 ${
                     post.repost >= 1
                       ? "text-green-500"
                       : "text-slate-500 group-hover:text-green-500"
                   }`}
-                />
-                <span className="text-sm text-slate-500 group-hover:text-green-500">
+                /> }
+                
+                {!isReposting && <span className="text-sm text-slate-500 group-hover:text-green-500">
                   {post.repost}
                 </span>
+              }
+               {isReposting && <LoadingSpinner size="sm" />}
               </div>
               <div
                 className="flex gap-1 items-center group cursor-pointer"
                 onClick={handleLikePost}
               >
-                {!isLiked && (
+                {!isLiking && !isLiked && (
                   <FaRegHeart className="w-4 h-4 cursor-pointer text-slate-500 group-hover:text-pink-500" />
                 )}
-                {isLiked && (
+                {!isLiking && isLiked && (
                   <FaHeart className="w-4 h-4 cursor-pointer text-pink-500 " />
                 )}
+                 {isLiking && <LoadingSpinner size="sm" />}
 
-                <span
+                {!isLiking && <span
                   className={`text-sm text-slate-500 group-hover:text-pink-500 ${
                     isLiked ? "text-pink-500" : ""
                   }`}
                 >
                   {post.likes.length}
-                </span>
+                </span> }
               </div>
             </div>
             <div
