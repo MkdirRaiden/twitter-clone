@@ -38,6 +38,11 @@ body {
   font-family: "Jost", sans-serif;
 }
 
+input:not(:placeholder-shown) {
+  /* border: 2px solid green; */
+  background-color: none !important;
+}
+
 .sidebar-link {
   @apply flex gap-3 items-center hover:bg-stone-900 transition-all w-full duration-300 px-4 py-2 cursor-pointer;
 }
