@@ -50,7 +50,7 @@ const AllSuggestedUsers = () => {
       <p className="p-4 font-bold md:hidden text-slate-500 text-lg">
         People You may Know
       </p>
-      <div className="md:hidden max-w-screen-sm">
+      <div className="md:hidden max-w-(--breakpoint-sm)">
         <MobileSwiper />
       </div>
       <p className="p-4 font-bold md:hidden text-slate-500 text-lg">

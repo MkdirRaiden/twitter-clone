@@ -13,7 +13,7 @@ const Pagination = ({ pageNo, setPageNo, page, isPlaceholderData }) => {
                 onClick={() => {
                   setPageNo((old) => Math.max(old - 1, 1));
                 }}
-                className={` btn rounded-full w-12 h-12}`}
+                className={` btn rounded-full w-12 h-12`}
               >
                 <LiaArrowLeftSolid />
               </button>

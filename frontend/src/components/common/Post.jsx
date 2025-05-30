@@ -159,9 +159,9 @@ const Post = ({ post, username, savedPosts, setSavedPosts }) => {
               {/* We're using Modal Component from DaisyUI */}
               <dialog
                 id={`comments_modal${post._id}`}
-                className="modal border-none outline-none"
+                className="modal border-none outline-hidden"
               >
-                <div className="modal-box rounded border border-gray-600">
+                <div className="modal-box rounded-sm border border-gray-600">
                   <h3 className="font-bold text-lg mb-4">COMMENTS</h3>
                   <div className="flex flex-col gap-3 max-h-60 overflow-auto">
                     {post.comments.length === 0 && (
@@ -200,7 +200,7 @@ const Post = ({ post, username, savedPosts, setSavedPosts }) => {
                     onSubmit={handlePostComment}
                   >
                     <textarea
-                      className="textarea w-full p-1 rounded text-md resize-none border focus:outline-none  border-gray-800"
+                      className="textarea w-full p-1 rounded-sm text-md resize-none border focus:outline-hidden  border-gray-800"
                       placeholder="Add a comment..."
                       value={comment}
                       onChange={(e) => setComment(e.target.value)}
@@ -219,7 +219,7 @@ const Post = ({ post, username, savedPosts, setSavedPosts }) => {
                   </form>
                 </div>
                 <form method="dialog" className="modal-backdrop">
-                  <button className="outline-none">close</button>
+                  <button className="outline-hidden">close</button>
                 </form>
               </dialog>
               <div

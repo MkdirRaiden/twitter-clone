@@ -37,7 +37,7 @@ const SignUpPage = () => {
 
   return (
     <>
-      <div className="max-w-screen-xl mx-auto flex h-screen px-10">
+      <div className="max-w-(--breakpoint-xl) mx-auto flex h-screen px-10">
         <div className="flex-1 flex justify-center items-center gap-10">
           <div className="hidden max-w-1/2 lg:flex items-center justify-center">
             <div className="hidden max-w-1/2 lg:flex items-center justify-center">
@@ -53,7 +53,7 @@ const SignUpPage = () => {
               <h1 className="text-4xl font-extrabold text-white">
                 Join today.
               </h1>
-              <label className="input input-bordered rounded flex items-center gap-2">
+              <label className="input input-bordered rounded-sm flex items-center gap-2">
                 <MdOutlineMail />
                 <input
                   type="email"
@@ -66,7 +66,7 @@ const SignUpPage = () => {
                 />
               </label>
               <div className="flex gap-4 flex-wrap">
-                <label className="input input-bordered rounded flex items-center gap-2 flex-1">
+                <label className="input input-bordered rounded-sm flex items-center gap-2 flex-1">
                   <FaUser />
                   <input
                     type="text"
@@ -78,7 +78,7 @@ const SignUpPage = () => {
                     required
                   />
                 </label>
-                <label className="input input-bordered rounded flex items-center gap-2 flex-1">
+                <label className="input input-bordered rounded-sm flex items-center gap-2 flex-1">
                   <MdDriveFileRenameOutline />
                   <input
                     type="text"
@@ -91,7 +91,7 @@ const SignUpPage = () => {
                   />
                 </label>
               </div>
-              <label className="input input-bordered rounded flex items-center gap-2">
+              <label className="input input-bordered rounded-sm flex items-center gap-2">
                 <MdPassword />
                 <input
                   type="password"

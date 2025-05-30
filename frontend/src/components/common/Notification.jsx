@@ -56,7 +56,7 @@ const Notification = ({
           </div>
           <ul
             tabIndex={0}
-            className="dropdown-content menu bg-secondary rounded-box z-[1] w-52 p-2 shadow"
+            className="dropdown-content menu bg-secondary rounded-box z-1 w-52 p-2 shadow-sm"
           >
             <li>
               <button

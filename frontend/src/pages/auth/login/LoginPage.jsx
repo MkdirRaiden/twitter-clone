@@ -32,7 +32,7 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="max-w-screen-xl mx-auto flex h-screen md:px-10">
+    <div className="max-w-(--breakpoint-xl) mx-auto flex h-screen md:px-10">
       <div className="flex-1 flex justify-center items-center gap-10">
         <div className=" hidden max-w-1/2 lg:flex items-center justify-center">
           <XSvg className="w-52 h-52 fill-white" />
@@ -46,7 +46,7 @@ const LoginPage = () => {
             <h1 className="text-4xl font-extrabold text-white">
               {"Let's"} go.
             </h1>
-            <label className="input input-bordered rounded flex items-center gap-2">
+            <label className="input input-bordered rounded-sm flex items-center gap-2">
               <MdOutlineMail />
               <input
                 type="text"
@@ -59,7 +59,7 @@ const LoginPage = () => {
               />
             </label>
 
-            <label className="input input-bordered rounded flex items-center gap-2">
+            <label className="input input-bordered rounded-sm flex items-center gap-2">
               <MdPassword />
               <input
                 type="password"

@@ -1,5 +1,4 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import "./App.css";
 import HomePage from "./pages/home/HomePage";
 import SignUpPage from "./pages/auth/signup/SignUpPage";
 import LoginPage from "./pages/auth/login/LoginPage";
@@ -19,7 +18,7 @@ function App() {
     url: "/api/auth/getAuthUser",
   });
 
-    if (isLoading) {
+  if (isLoading) {
     return (
       <>
         <div className="flex max-w-full-screen-2xl h-screen justify-center items-center">

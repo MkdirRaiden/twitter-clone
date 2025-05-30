@@ -5,7 +5,7 @@ const UserCard = ({ user, authUser, isPending, followUnfollow }) => {
   return (
     <>
       {" "}
-      <div className="card pt-6 flex justify-center items-center shadow-md rounded-sm">
+      <div className="card pt-6 flex justify-center items-center shadow-md rounded-xs">
         <figure className="w-24 h-24 overflow-hidden rounded-lg">
           <img
             src={user.profileImg || "/avatar-placeholder.png"}

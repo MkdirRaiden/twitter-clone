@@ -1,6 +1,6 @@
 const UserCardSkeleton = () => {
   return (
-    <div className="card pt-6 flex justify-center items-center shadow-md rounded-sm">
+    <div className="card pt-6 flex justify-center items-center shadow-md rounded-xs">
       <div className="skeleton w-24 h-24 overflow-hidden rounded-lg"></div>
       <div className="card-body">
         <div className="skeleton h-4 w-28"></div>

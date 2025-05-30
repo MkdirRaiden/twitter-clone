@@ -31,7 +31,7 @@ const SavedPage = () => {
           {followingUsers.map((user) => {
             return (
               <Link key={user._id} to={`/profile/${user.username}`}>
-                <div className="card  pt-6 flex justify-center items-center shadow-md rounded-sm">
+                <div className="card  pt-6 flex justify-center items-center shadow-md rounded-xs">
                   <figure className="w-20 h-20 overflow-hidden rounded-full">
                     <img
                       src={user.profileImg || "/avatar-placeholder.png"}

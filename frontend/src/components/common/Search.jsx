@@ -45,8 +45,8 @@ const Search = ({ modalId, cls }) => {
       )}
 
       <dialog id={`${modalId}`} className="modal modal-top">
-        <div className="modal-box md:w-1/2 relative left-[50%] translate-x-[-50%] border border-gray-900 top-4 max-h-[75%]">
-          <label className="input input-bordered flex items-center gap-2">
+        <div className="modal-box md:w-1/2 w-full mx-auto relative border border-gray-900 top-4 max-h-[75%]">
+          <label className="input input-bordered w-full flex items-center gap-2">
             <form className="relative w-full">
               <HiOutlineMagnifyingGlass className="absolute -top-[.12rem] -left-2 w-7 h-7" />
               <input

@@ -69,8 +69,8 @@ const MobileSwiper = () => {
               return (
                 <swiper-slide key={index}>
                   <Link to={`/profile/${user.username}`} key={user._id}>
-                    <div className="card py-6 w-48 flex justify-center gap-4 items-center shadow-md rounded-sm">
-                      <figure className="w-16 h-16 overflow-hidden rounded-full border-1">
+                    <div className="card py-6 w-48 flex justify-center gap-4 items-center shadow-md rounded-xs">
+                      <figure className="w-16 h-16 overflow-hidden rounded-full border">
                         <img
                           src={user.profileImg || "/avatar-placeholder.png"}
                           alt={`${user.name} image`}
